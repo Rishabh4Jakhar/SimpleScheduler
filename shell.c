@@ -62,19 +62,26 @@ int create_process_and_run(char **args) {
         perror("shell.c: Fork Failed");
         exit(1);
     }
-    else if (status == 0) {
+    else if (status == 0)
+    {
         int check = execvp(args[0], args);
-        if (check == -1) {
+        if (check == -1)
+        {
             printf("%s: command not found\n", args[0]);
             exit(1);
         }
-    } else {
+    }
+    else
+    {
         int child_status;
         // Wait for the child to complete
         wait(&child_status);
-        if (WIFEXITED(child_status)) {
+        if (WIFEXITED(child_status))
+        {
             int exit_code = WEXITSTATUS(child_status);
-        } else {
+        }
+        else
+        {
             printf("Child process did not exit normally.\n");
         }
     }
@@ -82,62 +89,80 @@ int create_process_and_run(char **args) {
 }
 
 // launch function
-int launch(char **args) {
+int launch(char **args)
+{
     int status;
     status = create_process_and_run(args);
-    if (status > 0) {
-        history.record[history.histCount].proc_pid = 0;
-        //history.record[history.histCount].proc_pid = status;
-    } else
+    if (status > 0)
     {
         history.record[history.histCount].proc_pid = status;
+    }
+    else
+    {
+        history.record[history.histCount].proc_pid = 0;
     }
     return status;
 }
 
 // taking input from the terminal
-char *read_user_input() {
+char *read_user_input()
+{
     char *input = (char *)malloc(INPUT_SIZE);
-    if (input == NULL) {
-        perror("Error: Memory allocation failed\n");
+    if (input == NULL)
+    {
+        perror("Can't allocate memory\n");
         free(input);
         exit(EXIT_FAILURE);
     }
     size_t size = 0;
     int read = getline(&input, &size, stdin);
-    if (read != -1) {
+    if (read != -1)
+    {
         return input;
-    } else {
-        perror("Error: Some error occured while reading lines\n");
+    }
+    else
+    {
+        perror("Error while reading line\n");
         free(input);
         exit(1);
     }
 }
 
 // function to strip the leading and trailing spaces
-char *strip(char *stri) {
-    char stripped[strlen(stri) + 1];
-    int flag;
+char *strip(char *string)
+{
+    char stripped[strlen(string) + 1];
     int len = 0;
-    if (stri[0] == ' ') {
-        flag = 0;
-    } else {
+    int flag;
+    if (string[0] != ' ')
+    {
         flag = 1;
     }
-    for (int i = 0; stri[i] != '\0'; i++) {
-        if (stri[i] != ' ' && flag == 0) {
-            stripped[len++] = stri[i];
+    else
+    {
+        flag = 0;
+    }
+    for (int i = 0; string[i] != '\0'; i++)
+    {
+        if (string[i] != ' ' && flag == 0)
+        {
+            stripped[len++] = string[i];
             flag = 1;
-        } else if (flag == 1) {
-            stripped[len++] = stri[i];
-        } else if (stri[i] != ' ') {
+        }
+        else if (flag == 1)
+        {
+            stripped[len++] = string[i];
+        }
+        else if (string[i] != ' ')
+        {
             flag = 1;
         }
     }
-    char *final_strip = (char *)malloc(INPUT_SIZE);
     stripped[len] = '\0';
-    if (final_strip == NULL) {
-        perror("Error: Memory allocation failed\n");
+    char *final_strip = (char *)malloc(INPUT_SIZE);
+    if (final_strip == NULL)
+    {
+        perror("Memory allocation failed\n");
         exit(1);
     }
     memcpy(final_strip, stripped, INPUT_SIZE);
@@ -148,13 +173,15 @@ char *strip(char *stri) {
 char **tokenize(char *cmd, const char delim[2])
 {
     char **args = (char **)malloc(INPUT_SIZE * sizeof(char *));
-    if (args == NULL) {
-        perror("Error: Memory allocation failed\n");
+    if (args == NULL)
+    {
+        perror("Memory allocation failed\n");
         exit(1);
     }
     int count = 0;
     char *token = strtok(cmd, delim);
-    while (token != NULL) {
+    while (token != NULL)
+    {
         args[count++] = strip(token);
         token = strtok(NULL, delim);
     }
@@ -164,7 +191,8 @@ char **tokenize(char *cmd, const char delim[2])
 // Checking for quotation marks and backslash in the input
 bool validate_cmd(char *cmd)
 {
-    if (strchr(cmd, '\'') || strchr(cmd, '\"') || strchr(cmd, '\\')) {
+    if (strchr(cmd, '\\') || strchr(cmd, '\"') || strchr(cmd, '\''))
+    {
         return true;
     }
     return false;
@@ -172,28 +200,36 @@ bool validate_cmd(char *cmd)
 
 // SIGCHLD: Invoked when the child process terminates
 // Final execution time is calculated and the process is deleted from the running queue
-void sigchld_handler(int signum) {
+void sigchld_handler(int signum)
+{
     int status;
     pid_t pid;
     // returns the pid of the terminated child
     // WNOHANG: returns 0 if the status information of any process is not available i.e. the process has not terminated
     // In other words, the loop will only run after the background processes running has terminated or changed state
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-        for (int i = *front_r; i < *rear_r + 1; i++) {
-            if (running_queue[i].pid == pid) {
-                if (clock_gettime(CLOCK_MONOTONIC, &running_queue[i].end_time) == -1) {
-                    perror("Error: shell.c: clock_gettime");
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    {
+        for (int i = *front_r; i < *rear_r + 1; i++)
+        {
+            if (running_queue[i].pid == pid)
+            {
+                if (clock_gettime(CLOCK_MONOTONIC, &running_queue[i].end_time) == -1)
+                {
+                    perror("shell.c: clock_gettime");
                     exit(EXIT_FAILURE);
                 }
                 printf("Process terminated: %s\n", running_queue[i].name);
                 running_queue[i].execution_time += ((running_queue[i].end_time.tv_sec - running_queue[i].start_time.tv_sec) * 1000) + (running_queue[i].end_time.tv_nsec + running_queue[i].start_time.tv_nsec) / 1e6;
-                for (int k = 0; k < *total_processes; k++) {
-                    if (process_table[k].pid == running_queue[i].pid) {
+                for (int k = 0; k < *total_processes; k++)
+                {
+                    if (process_table[k].pid == running_queue[i].pid)
+                    {
                         process_table[k] = running_queue[i];
                         break;
                     }
                 }
-                for (int j = i; j < *rear_r; j++) {
+                for (int j = i; j < *rear_r; j++)
+                {
                     running_queue[j] = running_queue[j + 1];
                 }
                 (*rear_r)--;
@@ -201,8 +237,10 @@ void sigchld_handler(int signum) {
             }
         }
         // Updating the history
-        for (int i = 0; i < history.histCount; i++) {
-            if (history.record[i].proc_pid == pid) {
+        for (int i = 0; i < history.histCount; i++)
+        {
+            if (history.record[i].proc_pid == pid)
+            {
                 history.record[i].end_time = time(NULL);
                 history.record[i].duration = difftime(
                     history.record[i].end_time,
@@ -213,19 +251,23 @@ void sigchld_handler(int signum) {
 }
 
 // main shell loop
-void shell_loop() {
+void shell_loop()
+{
     // Setting the function for SIGINT (Ctrl + C)
-    if (signal(SIGINT, my_handler) == SIG_ERR) {
-        perror("Error: SIGINT handling failed");
+    if (signal(SIGINT, my_handler) == SIG_ERR)
+    {
+        perror("SIGINT handling failed");
         exit(1);
     }
     // Setting the function for SIGCHLD
-    if (signal(SIGCHLD, sigchld_handler) == SIG_ERR) {
-        perror("Error: SIGCHLD handling failed");
+    if (signal(SIGCHLD, sigchld_handler) == SIG_ERR)
+    {
+        perror("SIGCHLD handling failed");
         exit(1);
     }
     // Setting the function for timer interrupt
-    if (set_sigalrm(SIGALRM, SA_RESTART, sigalrm_handler) == -1) {
+    if (set_sigalrm(SIGALRM, SA_RESTART, sigalrm_handler) == -1)
+    {
         perror("SIGALRM handling failed");
         exit(1);
     }
@@ -238,17 +280,20 @@ void shell_loop() {
     }
     char host[INPUT_SIZE];
     int hostname = gethostname(host, sizeof(host));
-    if (hostname == -1) {
+    if (hostname == -1)
+    {
         perror("HOST not declared");
         exit(1);
     }
     int status;
-    do {
+    do
+    {
         printf("%s@%s~$ ", user, host);
         // taking input
         char *cmd = read_user_input();
         // handling the case if the input is blank or enter key
-        if (strlen(cmd) == 0 || strcmp(cmd, "\n") == 0) {
+        if (strlen(cmd) == 0 || strcmp(cmd, "\n") == 0)
+        {
             status = 1;
             continue;
         }
@@ -256,11 +301,13 @@ void shell_loop() {
         cmd = strtok(cmd, "\n");
         bool isInvalidcmd = validate_cmd(cmd);
         char *tmp = strdup(cmd);
-        if (tmp == NULL) {
+        if (tmp == NULL)
+        {
             perror("Error in strdup");
             exit(EXIT_FAILURE);
         }
-        if (isInvalidcmd) {
+        if (isInvalidcmd)
+        {
             status = 1;
             strcpy(history.record[history.histCount].cmd, tmp);
             history.record[history.histCount].start_time = time(NULL);
@@ -273,8 +320,10 @@ void shell_loop() {
             continue;
         }
         // checking if the input is "history"
-        if (strstr(cmd, "history")) {
-            if (history.histCount > 0) {
+        if (strstr(cmd, "history"))
+        {
+            if (history.histCount > 0)
+            {
                 strcpy(history.record[history.histCount].cmd, tmp);
                 history.record[history.histCount].start_time = time(NULL);
                 disHist();
@@ -283,12 +332,16 @@ void shell_loop() {
                     history.record[history.histCount].end_time,
                     history.record[history.histCount].start_time);
                 history.histCount++;
-            } else {
+            }
+            else
+            {
                 status = 1;
                 printf("No cmd in the history\n");
                 continue;
             }
-        } else if (strcmp(cmd, "run") == 0) {
+        }
+        else if (strcmp(cmd, "run") == 0)
+        {
             // Starting the timer before executing the process
             if (timer_handler(TSLICE * 1e6) == -1)
             {
@@ -297,7 +350,9 @@ void shell_loop() {
             }
             // Sending a signal to the child process to start the scheduler in the background
             kill(child_pid, SIGCONT);
-        } else {
+        }
+        else
+        {
             char **args = tokenize(cmd, " ");
             strcpy(history.record[history.histCount].cmd, tmp);
             history.record[history.histCount].start_time = time(NULL);
@@ -315,7 +370,9 @@ void shell_loop() {
                         printf("Error executing %s\n", args[1]);
                         exit(1);
                     }
-                } else if (pid > 0) { // Parent process
+                }
+                else if (pid > 0)
+                { // Parent process
                     // Pausing the execution of the child process to where it was
                     if (kill(pid, SIGSTOP) == -1)
                     {
@@ -333,7 +390,9 @@ void shell_loop() {
                             perror("Allocation failed\n");
                             exit(1);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         // default priority = 1
                         p = create_process(args[1], 1);
                         if (&p == NULL)
@@ -347,17 +406,24 @@ void shell_loop() {
                     add_process(p);
                     add_process_table(p);
                     num_processes++;
-                } else {
+                }
+                else
+                {
                     perror("shell.c: Fork failed\n");
                     exit(1);
                 }
                 status = pid;
-                if (status > 0) {
+                if (status > 0)
+                {
                     history.record[history.histCount].proc_pid = status;
-                } else {
+                }
+                else
+                {
                     history.record[history.histCount].proc_pid = 0;
                 }
-            } else {
+            }
+            else
+            {
                 status = launch(args);
             }
             history.record[history.histCount].end_time = time(NULL);
@@ -370,8 +436,10 @@ void shell_loop() {
 }
 
 // Main function
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
+int main(int argc, char *argv[])
+{
+    if (argc != 3)
+    {
         printf("Usage: %s <NCPU> <TSLICE>\n", argv[0]);
         exit(1);
     }
