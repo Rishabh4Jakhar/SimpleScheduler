@@ -204,6 +204,7 @@ void sigchld_handler(int signum)
 {
     int status;
     pid_t pid;
+    int saved_errno = errno;
     // returns the pid of the terminated child
     // WNOHANG: returns 0 if the status information of any process is not available i.e. the process has not terminated
     // In other words, the loop will only run after the background processes running has terminated or changed state
@@ -248,6 +249,7 @@ void sigchld_handler(int signum)
             }
         }
     }
+    errno = saved_errno;
 }
 
 // main shell loop
@@ -289,6 +291,7 @@ void shell_loop()
     do
     {
         printf("%s@%s~$ ", user, host);
+        fflush(stdout); 
         // taking input
         char *cmd = read_user_input();
         // handling the case if the input is blank or enter key
