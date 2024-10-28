@@ -1,7 +1,10 @@
 #include "scheduler.h"
 
 void scheduler() {
-    while true  {
+    printf("Scheduler started!\n");
+
+    // Continuous loop for round-robin scheduling
+    while (1) {
         if (ready_queue1[*front1].pid != 0) {
             move_ready_to_running(front1, rear1, ready_queue1);
         } else if (ready_queue2[*front2].pid != 0) {
@@ -11,31 +14,19 @@ void scheduler() {
         } else if (ready_queue4[*front4].pid != 0) {
             move_ready_to_running(front4, rear4, ready_queue4);
         } else {
-            printf("All ready queues are empty\n");
+            printf("All ready queues are empty, waiting for new submissions.\n");
+            sleep(1);  // Sleep to prevent busy waiting
+        }
+        
+        // Pause for TSLICE duration to simulate the time slice for each process
+        usleep(TSLICE * 1000);  // Convert TSLICE from milliseconds to microseconds
+
+        // Re-check queues after each time slice
+        if (all_queues_empty()) {
+            printf("Scheduler terminating: no more processes.\n");
+            break;
         }
     }
-    /*
-    if (ready_queue1[*front1].pid != 0)
-    {
-        move_ready_to_running(front1, rear1, ready_queue1);
-    }
-    else if (ready_queue2[*front2].pid != 0)
-    {
-        move_ready_to_running(front2, rear2, ready_queue2);
-    }
-    else if (ready_queue3[*front3].pid != 0)
-    {
-        move_ready_to_running(front3, rear3, ready_queue3);
-    }
-    else if (ready_queue4[*front4].pid != 0)
-    {
-        move_ready_to_running(front4, rear4, ready_queue4);
-    }
-    else
-    {
-        printf("All ready queues are empty\n");
-    }
-    */
 }
 
 void displayProcesses()
