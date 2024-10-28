@@ -405,7 +405,10 @@ void shell_loop()
                     add_process(p);
                     add_process_table(p);
                     num_processes++;
-                    kill(child_pid, SIGCONT);
+                    // Resume the scheduler if it’s paused
+                    if (kill(child_pid, SIGCONT) == -1) {
+                        perror("Failed to resume scheduler");
+                        exit(1);}
                 }
                 else
                 {
@@ -476,6 +479,7 @@ int main(int argc, char *argv[])
         // Child process: Running the scheduler
         printf("Starting the scheduler\n");
         scheduler();
+        exit(0);
     }
     else
     {
