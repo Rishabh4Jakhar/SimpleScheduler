@@ -15,24 +15,14 @@ void scheduler() {
             move_ready_to_running(front4, rear4, ready_queue4);
         } else {
             printf("All ready queues are empty, waiting for new submissions.\n");
-            sleep(1);  // Sleep to prevent busy waiting
+            //sleep(1);  // Sleep to prevent busy waiting
+            pause();  // Pause until a signal is received
         }
         
         // Pause for TSLICE duration to simulate the time slice for each process
         usleep(TSLICE * 1000);  // Convert TSLICE from milliseconds to microseconds
 
-        // Re-check queues after each time slice
-        if (all_queues_empty()) {
-            printf("Scheduler terminating: no more processes.\n");
-            break;
-        }
     }
-}
-bool all_queues_empty() {
-    return (ready_queue1[*front1].pid == 0 &&
-            ready_queue2[*front2].pid == 0 &&
-            ready_queue3[*front3].pid == 0 &&
-            ready_queue4[*front4].pid == 0);
 }
 void displayProcesses()
 {
