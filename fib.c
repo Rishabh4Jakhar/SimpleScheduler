@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "dummy_main.h"
 #include <stdlib.h>
 
 int fib(int n)
@@ -9,7 +10,7 @@ int fib(int n)
     return fib(n - 1) + fib(n - 2);
 }
 
-int main()
+int main(int argc, char **argv)
 {
   int n = 45;
   int val = fib(n);

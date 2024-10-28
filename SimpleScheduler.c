@@ -1,7 +1,20 @@
 #include "scheduler.h"
 
-void scheduler()
-{
+void scheduler() {
+    while true  {
+        if (ready_queue1[*front1].pid != 0) {
+            move_ready_to_running(front1, rear1, ready_queue1);
+        } else if (ready_queue2[*front2].pid != 0) {
+            move_ready_to_running(front2, rear2, ready_queue2);
+        } else if (ready_queue3[*front3].pid != 0) {
+            move_ready_to_running(front3, rear3, ready_queue3);
+        } else if (ready_queue4[*front4].pid != 0) {
+            move_ready_to_running(front4, rear4, ready_queue4);
+        } else {
+            printf("All ready queues are empty\n");
+        }
+    }
+    /*
     if (ready_queue1[*front1].pid != 0)
     {
         move_ready_to_running(front1, rear1, ready_queue1);
@@ -22,6 +35,7 @@ void scheduler()
     {
         printf("All ready queues are empty\n");
     }
+    */
 }
 
 void displayProcesses()

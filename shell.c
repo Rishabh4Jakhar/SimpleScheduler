@@ -32,9 +32,9 @@ void disEnd() {
         strftime(start_time_buff, sizeof(start_time_buff), "%Y-%m-%d %H:%M:%S", start_time_inf);
         struct tm *end_time_info = localtime(&record.end_time);
         char end_time_buffer[80];
-        strftime(end_time_buffer, sizeof(end_time_buffer), "%Y-%m-%d %H:%M:%S", end_time_inf);
+        strftime(end_time_buffer, sizeof(end_time_buffer), "%Y-%m-%d %H:%M:%S", end_time_info);
         printf("%s\nProcess PID: %d\n", record.cmd, record.proc_pid);
-        printf("Start time: %s\nEnd Time: %s\nProcess Duration: %f\n", start_time_buffer, end_time_buffer, record.duration);
+        printf("Start time: %s\nEnd Time: %s\nProcess Duration: %f\n", start_time_buff, end_time_buffer, record.duration);
         printf("--------------------------------\n");
     }
 }
@@ -360,8 +360,7 @@ void shell_loop()
             {
 
                 pid_t pid = fork();
-                if (pid == 0)
-                { // Child process
+                if (pid == 0) { // Child process
                     // Waiting for the scheduler signal before starting execution
                     printf("Process continued: %s\n", args[1]);
                     char *temp[2] = {args[1], NULL};
