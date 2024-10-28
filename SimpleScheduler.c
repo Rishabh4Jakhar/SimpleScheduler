@@ -28,7 +28,12 @@ void scheduler() {
         }
     }
 }
-
+bool all_queues_empty() {
+    return (ready_queue1[*front1].pid == 0 &&
+            ready_queue2[*front2].pid == 0 &&
+            ready_queue3[*front3].pid == 0 &&
+            ready_queue4[*front4].pid == 0);
+}
 void displayProcesses()
 {
     printf("--------------------------------\n");
