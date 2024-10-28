@@ -405,6 +405,7 @@ void shell_loop()
                     add_process(p);
                     add_process_table(p);
                     num_processes++;
+                    kill(child_pid, SIGCONT);
                 }
                 else
                 {
