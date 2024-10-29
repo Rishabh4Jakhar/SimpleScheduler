@@ -26,12 +26,20 @@ void disEnd() {
     printf("\nJob Completion Summary:\n");
     printf("--------------------------------\n");
     for (int i = 0; i < *total_processes; i++) {
-        printf("Name: %s\nPID: %d\nCompletion Time: %.2f ms\n\n",
-               process_table[i].name, process_table[i].pid,
-               process_table[i].execution_time);
+        struct Process proc = process_table[i];
+        
+        printf("Process Name: %s\n", proc.name);
+        printf("PID: %d\n", proc.pid);
+        printf("Priority: %d\n", proc.priority);
+
+        // Ensure minimum completion time is at least 1xTSLICE
+        double completion_time = (proc.execution_time < TSLICE) ? TSLICE : proc.execution_time;
+        printf("Completion Time: %.2f ms\n", completion_time);
+        printf("Wait Time: %lld ms\n", proc.wait_time);
+
         printf("--------------------------------\n");
     }    
-    printf("History of Commands: ")
+    printf("History of Commands: ")\n
     printf("--------------------------------\n");
     for (int i = 0; i < history.histCount; i++)
     {
@@ -414,6 +422,7 @@ void shell_loop()
                         }
                     }
                     p.pid = pid;
+                    p.prev_cycle = 0;
                     // Adding the process to the ready queue and the process table
                     add_process(p);
                     add_process_table(p);

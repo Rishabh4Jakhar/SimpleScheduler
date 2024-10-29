@@ -57,10 +57,16 @@ void move_ready_to_running(int *front, int *rear, process *ready_queue)
     {
         if (ready_queue[i].pid != 0)
         {
+
             printf("READY QUEUE --->\n");
             for (int j = *front; j < *rear + 1; j++)
             {
                 printf("%s (%d)\n", ready_queue[j].name, ready_queue[j].priority);
+            }
+            int cycles_waited = CPU_CYCLES - ready_queue[i].prev_cycle;
+            if (cycles_waited > 0) {
+                ready_queue[i].wait_time += cycles_waited * TSLICE;
+                //printf("Updated wait time for %s: %lld ms\n", ready_queue[i].name, ready_queue[i].wait_time);
             }
             printf("Runned process: %s (%d)\n", ready_queue[i].name, ready_queue[i].priority);
             if (clock_gettime(CLOCK_MONOTONIC, &ready_queue[i].start_time) == -1)
@@ -74,9 +80,9 @@ void move_ready_to_running(int *front, int *rear, process *ready_queue)
                 exit(1);
             }
             process p = remove_process(ready_queue[i]);
-            p.current_cycle = CPU_CYCLES + 1;
-            p.wait_time += (p.current_cycle - p.prev_cycle - 1) * TSLICE;
-            p.prev_cycle = p.current_cycle;
+            p.current_cycle = CPU_CYCLES;
+            //p.wait_time += (p.current_cycle - p.prev_cycle - 1) * TSLICE;
+            p.prev_cycle = CPU_CYCLES;
             p.state = RUNNING;
             add_process_r(p);
         }
