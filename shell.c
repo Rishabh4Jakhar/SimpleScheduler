@@ -30,7 +30,10 @@ void disEnd() {
         // Record duration = Process completion time + Process wait time
         // Use this to calculate wait time for each process
         // Execution time is in ms, while duration is in seconds
-        double wait_time = (double) (record.duration*1000 - process_table[i].execution_time) / (double) 1000;
+        double wait_time = (double) (record.duration*1000 - process_table[i].execution_time);
+        if (wait_time < 0) {
+            wait_time = 0;
+        }
         printf("Name: %s\nPID: %d\nCompletion Time: %.2f ms\nWait Time: %.2f ms\n",
                process_table[i].name, process_table[i].pid,
                process_table[i].execution_time, wait_time);
@@ -50,7 +53,7 @@ void disEnd() {
         strftime(end_time_buffer, sizeof(end_time_buffer), "%Y-%m-%d %H:%M:%S", end_time_info);
         printf("%s\nProcess PID: %d\n", record.cmd, record.proc_pid);
         
-        printf("Start time: %s\nEnd Time: %s\nProcess Duration: %f\n", start_time_buff, end_time_buffer, record.duration);
+        printf("Start time: %s\nEnd Time: %s\nProcess Duration: %f s (Approx)\n", start_time_buff, end_time_buffer, record.duration);
         printf("--------------------------------\n");
     }
 }
