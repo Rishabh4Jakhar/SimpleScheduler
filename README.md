@@ -1,5 +1,7 @@
 # Simple Scheduler
 
+## OS Assignment 3
+
 - A `Simple scheduler` runs `NCPU` number of processes and after `TSLICE` milliseconds, it stops the execution of the running processes and runs the next NCPU processes. This follows `round-robin` scheduling policy.
 - This is repeated till all the processes terminates.
 - NCPU and TSLICE are taken as command line parameters along with shell
@@ -23,5 +25,5 @@ Apart from unbiased round-robin, the order in which the processes executes also 
 
 ## Contributions By:
 
-- Rishabh Jakhar 2023435
-- Uday Pandita 2023563
+- Rishabh Jakhar (2023435)
+- Uday Pandita (2023563)
