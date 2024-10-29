@@ -36,11 +36,14 @@ static void sigalrm_handler(int sig)
         displayProcesses();
         num_processes = 0;
         // deleting the timer
-        timer_delete(timer);
-        empty_process_table();
-        kill(child_pid,SIGSTOP);
-        printf("Scheduler ended\n");
-        printf("Back to shell. Enter command to continue\n");
+        if (*total_processes == 0) {
+            timer_delete(timer);
+            empty_process_table();
+            kill(child_pid, SIGSTOP);
+            printf("Scheduler ended\n");
+            printf("Back to shell. Enter command to continue\n");
+        }
+
     }
     else
     {

@@ -5,6 +5,7 @@ void scheduler() {
 
     // Continuous loop for round-robin scheduling
     while (1) {
+        bool job_found = false;
         if (ready_queue1[*front1].pid != 0) {
             move_ready_to_running(front1, rear1, ready_queue1);
         } else if (ready_queue2[*front2].pid != 0) {
@@ -13,10 +14,17 @@ void scheduler() {
             move_ready_to_running(front3, rear3, ready_queue3);
         } else if (ready_queue4[*front4].pid != 0) {
             move_ready_to_running(front4, rear4, ready_queue4);
-        } else {
-            printf("All ready queues are empty, waiting for new submissions.\n");
-            //sleep(1);  // Sleep to prevent busy waiting
-            pause();  // Pause until a signal is received
+        } 
+        //else {
+        //    printf("All ready queues are empty, waiting for new submissions.\n");
+        //    //sleep(1);  // Sleep to prevent busy waiting
+        //    pause();  // Pause until a signal is received
+        //}
+
+        if (!job_found) {
+            printf("No jobs found, waiting for new submissions.\n");
+            sleep(1);  // Sleep to prevent busy waiting
+            //pause();  // Pause until a signal is received
         }
         
         // Pause for TSLICE duration to simulate the time slice for each process

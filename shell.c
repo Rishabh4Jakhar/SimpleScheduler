@@ -438,6 +438,10 @@ void shell_loop()
                 history.record[history.histCount].start_time);
             history.histCount++;
         }
+        free(args);
+        while (waitpid(-1, status, WNOHANG) > 0) {
+            printf("Child process terminated with status %d\n", status);
+        }
     } while (status);
 }
 
