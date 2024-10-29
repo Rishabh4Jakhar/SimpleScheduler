@@ -17,12 +17,19 @@ static void sigalrm_handler(int sig)
         }
         printf("Stopped process: %s\n", running_queue[i].name);
         running_queue[i].execution_time += TSLICE;
+        if (running_queue[i].execution_time < TSLICE) {
+            running_queue[i].execution_time = TSLICE;  // Ensure minimum of 1 TSLICE
+        }
+
         // Stopping the process by passing SIGSTOP signal
         if (kill(running_queue[i].pid, SIGSTOP) == -1)
         {
             perror("timer.c: SIGSTOP signal failed\n");
             exit(1);
         }
+        // Calculate wait time for next cycle
+        running_queue[i].wait_time += (CPU_CYCLES - running_queue[i].prev_cycle) * TSLICE;
+        running_queue[i].prev_cycle = CPU_CYCLES;
         // Removing the process from running queue, changing the state to READY and adding it to ready queue
         process p = remove_process_r(running_queue[i]);
         p.state = READY;

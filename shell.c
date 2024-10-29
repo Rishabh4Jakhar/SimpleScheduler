@@ -2,6 +2,7 @@
 #include "SimpleScheduler.c"
 #include "timer.c"
 #include "queue.c"
+#include <errno.h>
 
 // struct for each cmd stored in history
 struct ComParam {
@@ -22,6 +23,15 @@ struct ComHist history;
 
 // Function to display details of each command when the program is terminated using Ctrl + C
 void disEnd() {
+    printf("\nJob Completion Summary:\n");
+    printf("--------------------------------\n");
+    for (int i = 0; i < *total_processes; i++) {
+        printf("Name: %s\nPID: %d\nCompletion Time: %.2f ms\nWait Time: %lld ms\n",
+               process_table[i].name, process_table[i].pid,
+               process_table[i].execution_time, process_table[i].wait_time);
+        printf("--------------------------------\n");
+    }    
+    
     printf("--------------------------------\n");
     for (int i = 0; i < history.histCount; i++)
     {
@@ -437,9 +447,11 @@ void shell_loop()
                 history.record[history.histCount].end_time,
                 history.record[history.histCount].start_time);
             history.histCount++;
+
+            free(args);
         }
-        free(args);
-        while (waitpid(-1, status, WNOHANG) > 0) {
+
+        while (waitpid(-1, &status, WNOHANG) > 0) {
             printf("Child process terminated with status %d\n", status);
         }
     } while (status);
