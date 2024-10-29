@@ -20,3 +20,8 @@ Apart from unbiased round-robin, the order in which the processes executes also 
 ### Heuristics followed
 - It follows `non - preemptive priority scheduling`, that is, if a process of higher priority arrives before the process of lower priority completes its TSLICE, it will wait and will start executing only in the next TSLICE.
 - Processes of different priorities cannot run together. First, all the processes of higher priority will run and then lower priority. The number of CPUs available has no role in this.
+
+## Contributions By:
+
+- Rishabh Jakhar 2023435
+- Uday Pandita 2023563
