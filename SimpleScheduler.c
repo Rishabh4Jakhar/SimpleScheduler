@@ -55,13 +55,8 @@ void move_ready_to_running(int *front, int *rear, process *ready_queue)
     int start = *front;
     for (int i = start; i < end; i++)
     {
-        if (ready_queue[i].pid != 0) {
-            // Calculate the additional wait time for this cycle
-            int cycles_waited = CPU_CYCLES - ready_queue[i].prev_cycle;
-            ready_queue[i].wait_time += cycles_waited * TSLICE;
-
-            //printf("Wait time updated for %s: %lld ms\n", ready_queue[i].name, ready_queue[i].wait_time);
-
+        if (ready_queue[i].pid != 0)
+        {
             printf("READY QUEUE --->\n");
             for (int j = *front; j < *rear + 1; j++)
             {
