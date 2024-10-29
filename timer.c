@@ -16,15 +16,10 @@ static void sigalrm_handler(int sig)
             printf("%s\n", running_queue[j].name);
         }
         printf("Stopped process: %s\n", running_queue[i].name);
-        if (clock_gettime(CLOCK_MONOTONIC, &running_queue[i].end_time) == -1) {
-            perror("timer.c: clock_gettime");
-            exit(1);
+        running_queue[i].execution_time += TSLICE;
+        if (running_queue[i].execution_time < TSLICE) {
+            running_queue[i].execution_time = TSLICE;  // Ensure minimum of 1 TSLICE
         }
-        double elapsed_ms = ((running_queue[i].end_time.tv_sec - running_queue[i].start_time.tv_sec) * 1000.0)
-                            + (running_queue[i].end_time.tv_nsec - running_queue[i].start_time.tv_nsec) / 1e6;
-        
-        // Ensure minimum execution time is 1xTSLICE
-        running_queue[i].execution_time += (elapsed_ms < TSLICE) ? TSLICE : elapsed_ms;
 
         // Stopping the process by passing SIGSTOP signal
         if (kill(running_queue[i].pid, SIGSTOP) == -1)
@@ -44,7 +39,7 @@ static void sigalrm_handler(int sig)
     {
         // Scheduler ended
         printf("CPU CYCLE: %d\n", ++CPU_CYCLES);
-        //CPU_CYCLES = 0;
+        CPU_CYCLES = 0;
         displayProcesses();
         num_processes = 0;
         // deleting the timer

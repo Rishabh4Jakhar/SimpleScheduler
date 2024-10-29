@@ -26,20 +26,17 @@ void disEnd() {
     printf("\nJob Completion Summary:\n");
     printf("--------------------------------\n");
     for (int i = 0; i < *total_processes; i++) {
-        struct Process proc = process_table[i];
-        
-        printf("Process Name: %s\n", proc.name);
-        printf("PID: %d\n", proc.pid);
-        printf("Priority: %d\n", proc.priority);
-
-        // Ensure minimum completion time is at least 1xTSLICE
-        double completion_time = (proc.execution_time < TSLICE) ? TSLICE : proc.execution_time;
-        printf("Completion Time: %.2f ms\n", completion_time);
-        printf("Wait Time: %lld ms\n", proc.wait_time);
-
+        struct ComParam record = history.record[i];
+        // Record duration = Process completion time + Process wait time
+        // Use this to calculate wait time for each process
+        // Execution time is in ms, while duration is in seconds
+        double wait_time = (double) (record.duration*1000 - process_table[i].execution_time) / (double) 1000;
+        printf("Name: %s\nPID: %d\nCompletion Time: %.2f ms\nWait Time: %.2f ms\n",
+               process_table[i].name, process_table[i].pid,
+               process_table[i].execution_time, wait_time);
         printf("--------------------------------\n");
     }    
-    printf("History of Commands: ")\n
+    printf("History of Commands: \n");
     printf("--------------------------------\n");
     for (int i = 0; i < history.histCount; i++)
     {
@@ -52,6 +49,7 @@ void disEnd() {
         char end_time_buffer[80];
         strftime(end_time_buffer, sizeof(end_time_buffer), "%Y-%m-%d %H:%M:%S", end_time_info);
         printf("%s\nProcess PID: %d\n", record.cmd, record.proc_pid);
+        
         printf("Start time: %s\nEnd Time: %s\nProcess Duration: %f\n", start_time_buff, end_time_buffer, record.duration);
         printf("--------------------------------\n");
     }
@@ -422,7 +420,6 @@ void shell_loop()
                         }
                     }
                     p.pid = pid;
-                    p.prev_cycle = 0;
                     // Adding the process to the ready queue and the process table
                     add_process(p);
                     add_process_table(p);
